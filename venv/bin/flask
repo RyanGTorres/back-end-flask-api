@@ -1,4 +1,6 @@
-#!/home/ryan/Documentos/back-end-flask-api/venv/bin/python3
+#!/bin/sh
+'''exec' "/home/ryan/Documentos/clone back-end/back-end-flask-api/venv/bin/python3" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

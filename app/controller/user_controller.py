@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from app.services.user_service import UserService
-from marshmallow import Schema, fields, ValidationError
 from app.models import user_schema
 import logging
 
@@ -15,15 +14,25 @@ user_schema_many = user_schema.UserSchema(many=True)
 
 @user_bp.route('/', methods=['GET'])
 def get_all_users():
-    users = UserService.get_all_users()
-    return jsonify([user.to_json() for user in users]), 200
+    page = request.args.get('page', default=1, type=int)
+    perpage = request.args.get('perpage', default=10, type=int)
+
+    if page < 1:
+        return jsonify({'error': 'Página inválida. Deve ser maior que 0.'}), 400
+    if perpage <=    page or perpage > 100:
+        return jsonify({'error': 'Itens por página inválidos. Deve ser entre 1 e 100.'}), 400
+    
+    pagination = UserService.get_all_users(page=page, perpage=perpage)
+    result = user_schema_many.dump(pagination)
+    return jsonify(result), 200
+
 
 
 @user_bp.route('/<uuid:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     user = UserService.get_user_by_id(user_id)
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({'error', 'Usuario não encontrado'}), 404
     
     return jsonify(user.to_json()), 200
 
@@ -42,8 +51,8 @@ def uptdate_user(user_id):
         json_data = request.get_json()
         valid_data = user_schema_single.load(json_data)
         
-        if not valid_data:
-            return jsonify({'error': 'No input data provided'}), 400
+        if not json_data:
+            return jsonify({'error': 'Confira e envie novamente'}), 400
         
         uptdate_user = UserService.update_user(
             user_id,
@@ -55,7 +64,7 @@ def uptdate_user(user_id):
         return jsonify(result),200
     
     except ValueError as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 409
 
 
 
@@ -66,7 +75,7 @@ def save_user():
     print("Recebi:", data, type(data))
     
     if not data or not all(k in data for k in ['username', 'email', 'cpf']):
-        return jsonify({'error': 'Missing required fields'}), 400
+        return jsonify({'error': 'Campos obrigatorios ausentes'}), 400
     
     try:
         print(type(data))
@@ -84,7 +93,7 @@ def save_user():
         return jsonify(result), 201
     
     except ValueError as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 409
 
 @user_bp.route('/<uuid:user_id>', methods=['PUT'])
 def update_user(user_id):

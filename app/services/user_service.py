@@ -6,9 +6,12 @@ from sqlalchemy.exc import IntegrityError
 class UserService:
 
     @staticmethod
-    def get_all_users():
+    def get_all_users(page=1,perpage=10):
         """Retorna todos os usuarios"""
-        return User.query.all()
+        return User.query.paginate(
+            page=page, 
+            per_page=perpage, 
+            error_out=False).items
     
     @staticmethod
     def get_user_by_id(user_id):
@@ -54,7 +57,7 @@ class UserService:
         try:
             db.session.commit()
             return user
-        except Exception as e:
+        except IntegrityError as e:
             db.session.rollback()
             raise ValueError(f"Erro ao atualizar usuário: {str(e)}")
     

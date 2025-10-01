@@ -3,6 +3,7 @@ from marshmallow import Schema, fields, ValidationError, validates
 from marshmallow.validate import Length, Email
 
 class UserSchema(Schema):
+    id = fields.UUID()
     username = fields.Str(
         required=True, 
         validate=Length(min=3, max=50, error ="O nome de usuario deve ter entre 3 e 50 caracteres")
@@ -21,8 +22,7 @@ class UserSchema(Schema):
                        "null": "CPF não pode ser nulo",
                        "invalid": "CPF inválido"})
     
-    user_id = fields.UUID(dump_only=True)
-
+    
 @validates('cpf')
 def validade_cpf(cpf):
     cpf_sem_acentuacao = cpf.replace('.', '').replace('-', '')

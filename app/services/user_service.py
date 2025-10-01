@@ -1,6 +1,8 @@
 from app import db
 from app.models.user import User
 from sqlalchemy.exc import IntegrityError
+import logging
+
 
 
 class UserService:

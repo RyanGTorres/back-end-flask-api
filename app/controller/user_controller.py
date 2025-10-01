@@ -38,14 +38,22 @@ def get_user_by_email(user_email):
 
 @user_bp.route('/<uuid:user_id>', methods=['PUT'])
 def uptdate_user(user_id):
-    data = request.get_json()
     try:
-        UserService.update_user(
-            username=data['username'],
-            email=data['email'],
-            cpf=data['cpf']
+        json_data = request.get_json()
+        valid_data = user_schema_single.load(json_data)
+        
+        if not valid_data:
+            return jsonify({'error': 'No input data provided'}), 400
+        
+        uptdate_user = UserService.update_user(
+            user_id,
+            username=valid_data['username'],
+            email=valid_data['email'],
+            cpf=valid_data['cpf']
         )       
-        return jsonify(data.to_json()),200
+        result = user_schema_single.dump(uptdate_user)
+        return jsonify(result),200
+    
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
@@ -83,14 +91,16 @@ def update_user(user_id):
     data = request.get_json()
     
     try:
+        validate_data = user_schema_single.load(data)
+
         updated_user = UserService.update_user(
-            user_id,
-            username=data.get('username'),
-            email=data.get('email'),
-            cpf=data.get('cpf')
+            username=validate_data.get('username'),
+            email=validate_data.get('email'),
+            cpf=validate_data.get('cpf')
         )
         
-        return jsonify(updated_user.to_json()), 200
+        result = user_schema_single.dump(updated_user)
+        return jsonify(result), 200
     
     except ValueError as e:
         return jsonify({'error': str(e)}), 404

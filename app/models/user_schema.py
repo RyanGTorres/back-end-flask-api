@@ -21,7 +21,7 @@ class UserSchema(Schema):
                        "null": "CPF não pode ser nulo",
                        "invalid": "CPF inválido"})
     
-    id = fields.UUID(dump_only=True)
+    user_id = fields.UUID(dump_only=True)
 
 @validates('cpf')
 def validade_cpf(cpf):

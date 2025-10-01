@@ -44,19 +44,19 @@ class UserService:
         if not user:
             raise ValueError("Usuario não encontrado")
         
-        if username:
+        if username is not None:
             user.username = username
-        if email:
+        if email is not None:
             user.email = email
-        if cpf:
+        if cpf is not None:
             user.cpf = cpf
         
         try:
             db.session.commit()
             return user
-        except:
+        except Exception as e:
             db.session.rollback()
-            raise ValueError("Erro ao atualizar usuário")
+            raise ValueError(f"Erro ao atualizar usuário: {str(e)}")
     
     @staticmethod
     def delete_user(user_id):

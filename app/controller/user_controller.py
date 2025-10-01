@@ -34,7 +34,8 @@ def get_user_by_id(user_id):
     if not user:
         return jsonify({'error', 'Usuario não encontrado'}), 404
     
-    return jsonify(user.to_json()), 200
+    user_data = user_schema_single.dump(user)
+    return jsonify(user_data), 200
 
 @user_bp.route('/email/<string:user_email>', methods=['GET'])
 def get_user_by_email(user_email):
@@ -42,7 +43,9 @@ def get_user_by_email(user_email):
 
     if not user:
         return jsonify({'error':'Error ao encontrar usuario'}),404
-    return jsonify(user.to_json()),200
+    
+    user_data = user_schema_single.dump(user)
+    return jsonify(user_data),200
 
 
 @user_bp.route('/<uuid:user_id>', methods=['PUT'])

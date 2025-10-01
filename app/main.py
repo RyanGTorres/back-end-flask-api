@@ -2,6 +2,7 @@ from flask import Flask
 from os import environ
 from dotenv import load_dotenv
 from app import db
+from app.erros import register_errors
 from app.controller.user_controller import user_bp
 
 def create_app():
@@ -11,6 +12,8 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
+    register_errors(app)
+
     db.init_app(app)
     
     app.register_blueprint(user_bp)

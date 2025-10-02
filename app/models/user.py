@@ -10,14 +10,6 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     cpf = db.Column(db.String(20), unique=True, nullable=False)
-
-    def to_json(self):
-        return{
-            'id':str(self.id), 
-            'username':self.username,
-            'email':self.email, 
-            'cpf':self.cpf
-            }
     
     def __repr__(self):
         return f'<User {self.username}>'

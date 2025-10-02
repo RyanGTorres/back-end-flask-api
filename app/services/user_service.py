@@ -1,14 +1,19 @@
 from app import db
 from app.models.user import User
 from sqlalchemy.exc import IntegrityError
+import logging
+
 
 
 class UserService:
 
     @staticmethod
-    def get_all_users():
+    def get_all_users(page=1,perpage=10):
         """Retorna todos os usuarios"""
-        return User.query.all()
+        return User.query.paginate(
+            page=page, 
+            per_page=perpage, 
+            error_out=False).items
     
     @staticmethod
     def get_user_by_id(user_id):
@@ -44,19 +49,19 @@ class UserService:
         if not user:
             raise ValueError("Usuario não encontrado")
         
-        if username:
+        if username is not None:
             user.username = username
-        if email:
+        if email is not None:
             user.email = email
-        if cpf:
+        if cpf is not None:
             user.cpf = cpf
         
         try:
             db.session.commit()
             return user
-        except:
+        except IntegrityError as e:
             db.session.rollback()
-            raise ValueError("Erro ao atualizar usuário")
+            raise ValueError(f"Erro ao atualizar usuário: {str(e)}")
     
     @staticmethod
     def delete_user(user_id):

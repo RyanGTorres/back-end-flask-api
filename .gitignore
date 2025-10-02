@@ -10,3 +10,7 @@ data/
 
 # Variáveis de ambiente
 .env
+__pycache__/
+*.pyc
+venv/
+data/

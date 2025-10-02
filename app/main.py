@@ -2,8 +2,9 @@ from flask import Flask
 from os import environ
 from dotenv import load_dotenv
 from app import db
-from app.erros import register_errors
+from flask_jwt_extended import JWTManager
 from app.controller.user_controller import user_bp
+from app.ultils.logs_config import setup_logging
 
 def create_app():
     load_dotenv()
@@ -11,16 +12,16 @@ def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    register_errors(app)
-
+    app.config['JWT_SECRET_KEY'] = environ.get('JWT_SECRET_KEY')
+    jwt = JWTManager(app)
     db.init_app(app)
-    
+
+    setup_logging(app)
+
     app.register_blueprint(user_bp)
     
     with app.app_context():
         db.create_all()
-
     
     return app  
 
